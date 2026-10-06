@@ -1,0 +1,9 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "seller-lead-followup-mcp",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  // Stateless: no KV, no Durable Objects, no database.
+  "observability": { "enabled": false }
+}

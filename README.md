@@ -106,7 +106,7 @@ npm run deploy
 
 ## Privacy
 
-The server is stateless. It keeps no accounts, sessions, logs or lead data; each request is handled and forgotten. See [PRIVACY.md](PRIVACY.md).
+The server is stateless. It keeps no accounts, sessions, logs or lead data; each request is handled and forgotten. The hosted endpoint has one shared limit of 300 requests a minute per Cloudflare location to keep it available for everyone. See [PRIVACY.md](PRIVACY.md).
 
 ## Development
 

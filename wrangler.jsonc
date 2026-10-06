@@ -5,5 +5,8 @@
   "compatibility_date": "2026-09-01",
   "compatibility_flags": ["nodejs_compat"],
   // Stateless: no KV, no Durable Objects, no database.
-  "observability": { "enabled": false }
+  "observability": { "enabled": false },
+  // Global ceiling on /mcp: 300 requests per 60 seconds per Cloudflare location.
+  // namespace_id is any number unique within the Cloudflare account.
+  "ratelimits": [{ "name": "RATE_LIMITER", "namespace_id": "4801", "simple": { "limit": 300, "period": 60 } }]
 }

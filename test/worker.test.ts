@@ -54,4 +54,25 @@ describe("worker over Streamable HTTP", () => {
     expect((await worker.fetch(new Request("https://example.test/health"))).status).toBe(200);
     expect((await worker.fetch(new Request("https://example.test/nope"))).status).toBe(404);
   });
+
+  it("returns 429 with Retry-After when the global limit is hit, and passes when it is not", async () => {
+    const req = () =>
+      new Request("https://example.test/mcp", { method: "POST", headers: HEADERS, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" }) });
+    const keys: string[] = [];
+    const blocked = await worker.fetch(req(), { RATE_LIMITER: { limit: async ({ key }) => (keys.push(key), { success: false }) } });
+    expect(blocked.status).toBe(429);
+    expect(blocked.headers.get("retry-after")).toBe("60");
+    expect(blocked.headers.get("access-control-allow-origin")).toBe("*");
+    expect(((await blocked.json()) as any).error.code).toBe(-32000);
+    expect(keys).toEqual(["mcp-global"]);
+    const allowed = await worker.fetch(req(), { RATE_LIMITER: { limit: async () => ({ success: true }) } });
+    expect(allowed.status).toBe(200);
+  });
+
+  it("does not rate-limit health checks", async () => {
+    let called = false;
+    const res = await worker.fetch(new Request("https://example.test/health"), { RATE_LIMITER: { limit: async () => ((called = true), { success: false }) } });
+    expect(res.status).toBe(200);
+    expect(called).toBe(false);
+  });
 });

@@ -34,11 +34,31 @@ export async function handleMcp(request: Request): Promise<Response> {
   }
 }
 
+export type Env = {
+  /** Cloudflare rate limit binding (wrangler.jsonc). Absent in tests and plain Node. */
+  RATE_LIMITER?: { limit(opts: { key: string }): Promise<{ success: boolean }> };
+};
+
+/**
+ * One global ceiling for /mcp. Not per IP: every Claude or ChatGPT user arrives from those
+ * companies' shared servers, and Cloudflare advises against IP keys. Limits are per Cloudflare
+ * location and approximate by design.
+ */
+async function rateLimited(env: Env | undefined): Promise<Response | null> {
+  if (!env?.RATE_LIMITER) return null;
+  const { success } = await env.RATE_LIMITER.limit({ key: "mcp-global" });
+  if (success) return null;
+  return Response.json(
+    { jsonrpc: "2.0", id: null, error: { code: -32000, message: "Too many requests right now. Try again in a minute." } },
+    { status: 429, headers: { "Retry-After": "60" } },
+  );
+}
+
 export default {
-  async fetch(request: Request): Promise<Response> {
+  async fetch(request: Request, env?: Env): Promise<Response> {
     const url = new URL(request.url);
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
-    if (url.pathname === "/mcp") return withCors(await handleMcp(request));
+    if (url.pathname === "/mcp") return withCors((await rateLimited(env)) ?? (await handleMcp(request)));
     if (url.pathname === "/health") return Response.json({ ok: true, name: SERVER_NAME, version: SERVER_VERSION });
     if (url.pathname === "/")
       return new Response(

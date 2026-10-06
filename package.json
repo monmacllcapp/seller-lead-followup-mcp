@@ -1,0 +1,48 @@
+{
+  "name": "seller-lead-followup-mcp",
+  "version": "0.1.0",
+  "description": "MCP connector that plans seller lead follow-up and checks texts to sellers against calling-hour and opt-out rules. By MonmacLabs.",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "dev": "wrangler dev",
+    "stdio": "tsx src/stdio.ts",
+    "deploy": "wrangler deploy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/monmacllcapp/seller-lead-followup-mcp.git"
+  },
+  "keywords": [
+    "mcp",
+    "claude",
+    "chatgpt",
+    "real-estate",
+    "wholesaling",
+    "lead-follow-up",
+    "tcpa"
+  ],
+  "author": "MonmacLabs",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/monmacllcapp/seller-lead-followup-mcp/issues"
+  },
+  "homepage": "https://github.com/monmacllcapp/seller-lead-followup-mcp",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261006.1",
+    "@types/node": "^22.20.5",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7",
+    "wrangler": "^4.147.0"
+  },
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  }
+}
